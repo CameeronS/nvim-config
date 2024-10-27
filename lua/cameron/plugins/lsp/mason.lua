@@ -1,52 +1,56 @@
 return {
-	"williamboman/mason.nvim",
-	dependencies = {
-		"williamboman/mason-lspconfig.nvim",
-		"WhoIsSethDaniel/mason-tool-installer.nvim",
-	},
-	config = function()
-		-- import mason
-		local mason = require("mason")
-
-		-- import mason-lspconfig
-		local mason_lspconfig = require("mason-lspconfig")
-
-		local mason_tool_installer = require("mason-tool-installer")
-
-		-- enable mason and configure icons
-		mason.setup({
-			ui = {
-				icons = {
-					package_installed = "✓",
-					package_pending = "➜",
-					package_uninstalled = "✗",
+	{
+		"williamboman/mason.nvim",
+		priority = 1000, -- Ensure mason loads first
+		config = function()
+			local mason = require("mason")
+			mason.setup({
+				ui = {
+					icons = {
+						package_installed = "✓",
+						package_pending = "➜",
+						package_uninstalled = "✗",
+					},
 				},
-			},
-		})
-
-		mason_lspconfig.setup({
-			-- list of servers for mason to install
-			ensure_installed = {
-				"tsserver",
-				"html",
-				"cssls",
-				"tailwindcss",
-				"emmet_ls",
-				"prismals",
-				"pyright",
-				"mdx_analyzer",
-			},
-		})
-
-		mason_tool_installer.setup({
-			ensure_installed = {
-				"prettier", -- prettier formatter
-				"stylua", -- lua formatter
-				"isort", -- python formatter
-				"black", -- python formatter
-				"pylint",
-				"eslint_d",
-			},
-		})
-	end,
+			})
+		end,
+	},
+	{
+		"williamboman/mason-lspconfig.nvim",
+		dependencies = { "williamboman/mason.nvim" },
+		priority = 900, -- Load after mason but before other plugins
+		config = function()
+			require("mason-lspconfig").setup({
+				ensure_installed = {
+					"lua_ls",
+					"html",
+					"cssls",
+					"tailwindcss",
+					"emmet_ls",
+					"prismals",
+					"pyright",
+					"marksman",
+					"ts_ls",
+					"gopls",
+				},
+			})
+		end,
+	},
+	{
+		"WhoIsSethDaniel/mason-tool-installer.nvim",
+		dependencies = { "williamboman/mason.nvim" },
+		priority = 800, -- Load after mason and mason-lspconfig
+		config = function()
+			require("mason-tool-installer").setup({
+				ensure_installed = {
+					"prettier",
+					"stylua",
+					"isort",
+					"black",
+					"pylint",
+					"eslint_d",
+				},
+			})
+		end,
+	},
 }
